@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model NguoiDung {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  name         String?
+  pass_word    String
+  phone        String?
+  birth_day    String?
+  gender       String?
+  anh_dai_dien String?
+  role         Role       @default(USER)
+  Phong        Phong[]
+  binhLuan     BinhLuan[]
+  datPhong     DatPhong[]
+}
+
+model Phong {
+  id          Int        @id @default(autoincrement())
+  ten_phong   String
+  khach       Int?
+  phong_ngu   Int?
+  giuong      Int?
+  phong_tam   Int?
+  mo_ta       String?
+  gia_tien    Int?
+  may_giat    Boolean?
+  ban_la      Boolean?
+  tivi        Boolean?
+  dieu_hoa    Boolean?
+  wifi        Boolean?
+  bep         Boolean?
+  do_xe       Boolean?
+  ho_boi      Boolean?
+  ban_ui      Boolean?
+  hinh_anh    String     @db.Text
+  NguoiDung   NguoiDung  @relation(fields: [nguoiDungId], references: [id])
+  nguoiDungId Int        @unique
+  binhLuan    BinhLuan[]
+  datPhong    DatPhong[]
+}
+
+model BinhLuan {
+  id             Int       @id @default(autoincrement())
+  ngay_binh_luan DateTime  @default(now())
+  noi_dung       String
+  sao_binh_luan  Int
+  NguoiDung      NguoiDung @relation(fields: [nguoiDungId], references: [id])
+  nguoiDungId    Int
+  Phong          Phong     @relation(fields: [phongId], references: [id])
+  phongId        Int
+}
+
+model DatPhong {
+  id             Int       @id @default(autoincrement())
+  ngay_den       DateTime
+  ngay_di        DateTime
+  so_luong_khach Int
+  NguoiDung      NguoiDung @relation(fields: [nguoiDungId], references: [id])
+  nguoiDungId    Int
+  Phong          Phong     @relation(fields: [phongId], references: [id])
+  phongId        Int
+}
+
+model ViTri {
+  id         Int    @id @default(autoincrement())
+  ten_vi_tri String
+  tinh_thanh String
+  quoc_gia   String
+  hinh_anh   String @db.Text
+}
+
+enum Role {
+  USER
+  ADMIN
+}
