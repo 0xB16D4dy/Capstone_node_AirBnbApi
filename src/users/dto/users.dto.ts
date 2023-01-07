@@ -1,17 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { NguoiDungRegDto } from 'src/auth/dto';
 
 export enum UserRole {
   User = 'USER',
   Admin = 'ADMIN',
 }
-export class NguoiDungRegDto {
+
+export class UserInfoDto {
   @ApiProperty({ description: 'id', type: Number })
   id: number;
-  @ApiProperty({ description: 'name', type: String })
-  name: string;
   @ApiProperty({ description: 'email', type: String })
   email: string;
+  @ApiProperty({ description: 'name', type: String })
+  name: string;
   @ApiProperty({ description: 'password', type: String })
   pass_word: string;
   @ApiProperty({ description: 'phone', type: String })
@@ -20,14 +21,10 @@ export class NguoiDungRegDto {
   birth_day: string;
   @ApiProperty({ description: 'gender', type: String })
   gender: string;
-  //ADMIN or USER (default is USER)
+  @ApiProperty({ description: 'anh_dai_dien', type: String })
+  anh_dai_dien: string;
   @ApiProperty({ description: 'role', enum: UserRole })
-  role: Role;
+  role: string;
 }
 
-export class NguoiDungLogDto {
-  @ApiProperty({ description: 'email', type: String })
-  email: string;
-  @ApiProperty({ description: 'password', type: String })
-  pass_word: string;
-}
+export class UpdateUserDto extends PartialType(NguoiDungRegDto) {}

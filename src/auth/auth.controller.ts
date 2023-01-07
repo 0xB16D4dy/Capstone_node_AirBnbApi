@@ -1,4 +1,3 @@
-import { ResponseResult } from './interfaces/auth.interface';
 import {
   Body,
   Controller,
@@ -8,17 +7,19 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { NguoiDung } from './dto';
+import { NguoiDungLogDto, NguoiDungRegDto } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('api/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   //Route Post signIn
   @Post('signin')
-  async signin(@Body() body: NguoiDung): Promise<string> {
-    const { email, password } = body;
-    const checkLogin = await this.authService.signin(email, password);
+  async signin(@Body() body: NguoiDungLogDto): Promise<string> {
+    const { email, pass_word } = body;
+    const checkLogin = await this.authService.signin(email, pass_word);
     if (checkLogin.check) {
       //jwt
       return checkLogin.data;
@@ -28,14 +29,14 @@ export class AuthController {
   }
   //Route POST signUp
   @Post('signup')
-  async signup(@Body() body: NguoiDung): Promise<string> {
-    const { email, password, name, phone, birthday, gender, role } = body;
+  async signup(@Body() body: NguoiDungRegDto): Promise<string> {
+    const { email, pass_word, name, phone, birth_day, gender, role } = body;
     const checkSignUp = await this.authService.signup(
       email,
       name,
-      password,
+      pass_word,
       phone,
-      birthday,
+      birth_day,
       gender,
       role,
     );
