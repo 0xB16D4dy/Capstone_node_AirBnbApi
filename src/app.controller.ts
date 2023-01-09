@@ -4,10 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Controller('/api')
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private config: ConfigService,
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
   @Get('/getHello')
   getHello(): string {

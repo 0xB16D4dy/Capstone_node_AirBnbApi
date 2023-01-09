@@ -14,6 +14,7 @@ import {
   ForbiddenException,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AvatarDto, FileUploadDto, UpdateUserDto, UserInfoDto } from './dto';
@@ -25,8 +26,8 @@ import {
   ApiConsumes,
   ApiTags,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
-import { ResponeRes } from './interfaces';
 
 @ApiTags('Users')
 @Controller('/api/users')
@@ -60,7 +61,7 @@ export class UsersController {
         role,
       );
       if (checkSignUp.check) {
-        return checkSignUp.data;
+        return { statusCode: 200, content: checkSignUp.data };
       } else {
         throw new BadRequestException(checkSignUp.data);
       }
@@ -84,6 +85,34 @@ export class UsersController {
       return this.usersService.deleteUser(Number(id));
     }
   }
+  //Route GET pagination search
+  @ApiQuery({
+    name: 'pageIndex',
+    type: 'integer',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    type: 'integer',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'keyword',
+    type: 'string',
+    required: false,
+  })
+  @Get('/phan-trang-tim-kiem')
+  async paginationSearchInfo(
+    @Query('pageIndex') pageIndex: string,
+    @Query('pageSize') pageSize: string,
+    @Query('keyword') keyword: string,
+  ): Promise<any> {
+    return this.usersService.getOffsetPaginationList({
+      skip: +pageIndex,
+      take: +pageSize,
+      keyword,
+    });
+  }
   //Route GET get info user by id
   @ApiParam({
     name: 'id',
@@ -91,11 +120,18 @@ export class UsersController {
     format: 'int32',
   })
   @Get(':id')
-  getInfoUser(@Req() req: Request): Promise<UserInfoDto | string> {
+  async getInfoUser(@Req() req: Request): Promise<UserInfoDto | any> {
     const { id } = req.params;
-    return this.usersService.getInfoUser(+id);
+    const checkResult = await this.usersService.getInfoUser(+id);
+    if (checkResult.check) {
+      return { statusCode: 200, content: checkResult.data };
+    } else {
+      throw new BadRequestException(checkResult.data);
+    }
   }
-  //Route PUT update info user by di
+  //Route PUT update info user by id
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiParam({
     name: 'id',
     type: 'integer',
@@ -105,13 +141,28 @@ export class UsersController {
   async updateInfoUser(
     @Req() req: Request,
     @Body() body: UpdateUserDto,
-  ): Promise<UpdateUserDto | string> {
+  ): Promise<UpdateUserDto | any> {
     const { id } = req.params;
     const checkUpdate = await this.usersService.updateUser(+id, body);
     if (checkUpdate.check) {
-      return checkUpdate.data;
+      return { statusCode: 200, content: checkUpdate.data };
     } else {
       throw new BadRequestException(checkUpdate.data);
+    }
+  }
+  //Rout GET search by name
+  @ApiParam({
+    name: 'tenNguoiDung',
+    type: 'string',
+  })
+  @Get('search/:tenNguoiDung')
+  async searchByName(@Req() req: Request): Promise<any> {
+    const { tenNguoiDung } = req.params;
+    const checkResult = await this.usersService.searchByName(tenNguoiDung);
+    if (checkResult.check) {
+      return { statusCode: 200, content: checkResult.data };
+    } else {
+      throw new BadRequestException(checkResult.data);
     }
   }
   //Route POST upload Avatar

@@ -43,11 +43,13 @@ model Phong {
   do_xe       Boolean?
   ho_boi      Boolean?
   ban_ui      Boolean?
+  viTri       ViTri      @relation(fields: [ma_vi_tri], references: [id])
+  ma_vi_tri   Int
   hinh_anh    String     @db.Text
-  NguoiDung   NguoiDung  @relation(fields: [nguoiDungId], references: [id])
-  nguoiDungId Int        @unique
   binhLuan    BinhLuan[]
   datPhong    DatPhong[]
+  NguoiDung   NguoiDung? @relation(fields: [nguoiDungId], references: [id])
+  nguoiDungId Int?
 }
 
 model BinhLuan {
@@ -55,10 +57,10 @@ model BinhLuan {
   ngay_binh_luan DateTime  @default(now())
   noi_dung       String
   sao_binh_luan  Int
-  NguoiDung      NguoiDung @relation(fields: [nguoiDungId], references: [id])
-  nguoiDungId    Int
-  Phong          Phong     @relation(fields: [phongId], references: [id])
-  phongId        Int
+  NguoiDung      NguoiDung @relation(fields: [nguoi_dung_id], references: [id])
+  nguoi_dung_id  Int
+  Phong          Phong     @relation(fields: [phong_id], references: [id])
+  phong_id       Int
 }
 
 model DatPhong {
@@ -66,18 +68,19 @@ model DatPhong {
   ngay_den       DateTime
   ngay_di        DateTime
   so_luong_khach Int
-  NguoiDung      NguoiDung @relation(fields: [nguoiDungId], references: [id])
-  nguoiDungId    Int
-  Phong          Phong     @relation(fields: [phongId], references: [id])
-  phongId        Int
+  NguoiDung      NguoiDung @relation(fields: [nguoi_dung_id], references: [id])
+  nguoi_dung_id  Int
+  Phong          Phong     @relation(fields: [phong_id], references: [id])
+  phong_id       Int
 }
 
 model ViTri {
-  id         Int    @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   ten_vi_tri String
   tinh_thanh String
   quoc_gia   String
-  hinh_anh   String @db.Text
+  hinh_anh   String  @db.Text
+  Phong      Phong[]
 }
 
 enum Role {

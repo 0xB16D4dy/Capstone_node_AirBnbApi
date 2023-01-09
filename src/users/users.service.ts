@@ -6,7 +6,7 @@ import { UserInfoDto } from './dto';
 import { ResponeRes } from './interfaces';
 @Injectable()
 export class UsersService {
-  prisma: PrismaClient = new PrismaClient({ log: ['query'] });
+  prisma: PrismaClient = new PrismaClient({ log: ['error'] });
   async findAll(): Promise<any[]> {
     return await this.prisma.nguoiDung.findMany();
   }
@@ -81,7 +81,7 @@ export class UsersService {
       return 'Lỗi server!!!';
     }
   }
-  async getInfoUser(id: number): Promise<UserInfoDto | string> {
+  async getInfoUser(id: number): Promise<any> {
     try {
       const checkUser = await this.prisma.nguoiDung.findFirst({
         where: {
@@ -89,9 +89,9 @@ export class UsersService {
         },
       });
       if (checkUser) {
-        return checkUser;
+        return { check: true, data: checkUser };
       } else {
-        return 'User không tồn tại !!!';
+        return { check: false, data: 'User không tồn tại !!!' };
       }
     } catch (error) {
       console.log(error);
@@ -132,6 +132,65 @@ export class UsersService {
     } catch (error) {
       console.log(error);
       return { check: false, data: 'Lỗi server!!!' };
+    }
+  }
+
+  async getOffsetPaginationList(params: {
+    skip?: number;
+    take?: number;
+    keyword?: string;
+  }): Promise<any> {
+    try {
+      const { skip, take, keyword } = params;
+
+      if (isNaN(skip)) {
+        return await this.prisma.nguoiDung.findMany({
+          take,
+        });
+      } else {
+        if (take) {
+          return await this.prisma.nguoiDung.findMany({
+            skip,
+            take,
+            where: {
+              name: {
+                contains: keyword,
+              },
+            },
+            orderBy: {
+              id: 'asc',
+            },
+          });
+        } else {
+          return 'vui lòng nhập pageSize';
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return 'Lỗi server!!!';
+    }
+  }
+
+  async searchByName(keyword: string): Promise<any> {
+    try {
+      if (keyword) {
+        const result = await this.prisma.nguoiDung.findMany({
+          where: {
+            name: {
+              contains: keyword,
+            },
+          },
+        });
+        return { check: true, data: result };
+      } else {
+        return {
+          check: false,
+          data: 'Vui lòng điền keyword!!!',
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      return 'Lỗi server!!!';
     }
   }
 }
