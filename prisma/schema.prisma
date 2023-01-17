@@ -54,7 +54,7 @@ model Phong {
 
 model BinhLuan {
   id             Int       @id @default(autoincrement())
-  ngay_binh_luan DateTime  @default(now())
+  ngay_binh_luan String
   noi_dung       String
   sao_binh_luan  Int
   NguoiDung      NguoiDung @relation(fields: [nguoi_dung_id], references: [id])

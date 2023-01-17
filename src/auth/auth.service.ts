@@ -30,6 +30,7 @@ export class AuthService {
       }
     } catch (error) {
       console.log(error);
+      return { check: false, data: 'Lỗi Server!!!' };
     }
   }
   //signUp
@@ -68,6 +69,7 @@ export class AuthService {
       }
     } catch (error) {
       console.log(error);
+      return { check: false, data: 'Lỗi Server!!!' };
     }
   }
 }

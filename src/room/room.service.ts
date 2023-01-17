@@ -114,15 +114,19 @@ export class RoomService {
   }
   async getRoomById(id: number): Promise<any> {
     try {
-      const checkRoom = await this.prisma.phong.findFirst({
-        where: {
-          id,
-        },
-      });
-      if (checkRoom) {
-        return { check: true, data: checkRoom };
+      if (isNaN(id)) {
+        return { check: false, data: 'Id không hợp lệ' };
       } else {
-        return { check: false, data: 'Phòng không tồn tại' };
+        const checkRoom = await this.prisma.phong.findFirst({
+          where: {
+            id,
+          },
+        });
+        if (checkRoom) {
+          return { check: true, data: checkRoom };
+        } else {
+          return { check: false, data: 'Phòng không tồn tại' };
+        }
       }
     } catch (error) {
       console.log(error);
@@ -232,17 +236,21 @@ export class RoomService {
 
   async uploadImageRoom(filename: string, id: number): Promise<any> {
     try {
-      const checkRoom = this.prisma.phong.findFirst({
-        where: { id },
-      });
-      if (checkRoom) {
-        await this.prisma.phong.update({
-          data: { hinh_anh: filename },
+      if (isNaN(id)) {
+        return { check: false, data: 'Id không hợp lệ' };
+      } else {
+        const checkRoom = await this.prisma.viTri.findFirst({
           where: { id },
         });
-        return { check: true, data: 'Upload thành công' };
-      } else {
-        return { check: true, data: 'Upload Thất bại' };
+        if (checkRoom) {
+          await this.prisma.viTri.update({
+            data: { hinh_anh: filename },
+            where: { id },
+          });
+          return { check: true, data: 'Upload thành công' };
+        } else {
+          return { check: true, data: 'Upload Thất bại' };
+        }
       }
     } catch (error) {
       console.log(error);
